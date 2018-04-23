@@ -8,7 +8,9 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "clean": "rm -rf dist/*",
+    "prepublish": "npm run clean ; npm run build"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,9 @@
   "bugs": {
     "url": "git+https://github.com/emilioastarita/facturajs/issues"
   },
+  "files": [
+    "dist/*"
+  ],
   "keywords": [
     "afip",
     "factura",
