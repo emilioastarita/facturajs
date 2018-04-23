@@ -1,0 +1,48 @@
+{
+  "name": "facturajs",
+  "description": "Comunicación con los web services de AFIP utilizando nodejs.",
+  "author": "Emilio Astarita",
+  "licence": "MIT",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emilioastarita/facturajs.git"
+  },
+  "bugs": {
+    "url": "git+https://github.com/emilioastarita/facturajs/issues"
+  },
+  "keywords": [
+    "afip",
+    "factura",
+    "factura electrónica",
+    "wsfe",
+    "wsfev1",
+    "web service",
+    "soap",
+    "nodejs"
+  ],
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "debug": "^3.1.0",
+    "moment": "^2.13.0",
+    "node-forge": "^0.7.5",
+    "ntpclient": "^0.6.1",
+    "soap": "^0.24.0",
+    "source-map-support": "^0.5.4",
+    "uniqid": "^4.1.1",
+    "xml2js": "^0.4.16"
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.20",
+    "@types/node-forge": "^0.7.2",
+    "@types/uniqid": "^4.1.2",
+    "@types/xml2js": "^0.4.2",
+    "typescript": "^2.8.3"
+  }
+}
