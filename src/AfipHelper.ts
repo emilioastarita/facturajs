@@ -43,7 +43,7 @@ export class AfipHelper {
             login: 'https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl'
         },
         prod: {
-            service: 'https://servicios1.afip.gov.ar/{service}/service.asmx?WSDL',
+            service: 'https://servicios1.afip.gov.ar/{name}/service.asmx?WSDL',
             login: 'https://wsaa.afip.gov.ar/ws/services/LoginCms?wsdl'
         },
     };
