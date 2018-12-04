@@ -83,7 +83,9 @@ export class AfipHelper {
         const urls = this.urls[this.getAfipEnvironment()];
         const type = serviceName === 'login' ? 'login' : 'service';
         const url = urls[type].replace('{name}', encodeURIComponent(serviceName))
-        return soap.createClientAsync(url)
+        return soap.createClientAsync(url, {
+            namespaceArrayElements: false
+        });
     }
 
     private retrieveTokens(service: WsServicesNames) {
