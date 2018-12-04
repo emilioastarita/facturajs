@@ -1,6 +1,5 @@
 import {IConfigService} from "./AfipServices";
 import {debug, parseXml, LOG, writeFile, readFile, signMessage} from "./util";
-import * as fs from "fs";
 import * as Promise from "bluebird"
 import moment = require("moment");
 import * as soap from "soap";
@@ -82,7 +81,7 @@ export class AfipHelper {
     private getSoapClient(serviceName: WsServicesNames): any {
         const urls = this.urls[this.getAfipEnvironment()];
         const type = serviceName === 'login' ? 'login' : 'service';
-        const url = urls[type].replace('{name}', encodeURIComponent(serviceName))
+        const url = urls[type].replace('{name}', encodeURIComponent(serviceName));
         return soap.createClientAsync(url)
     }
 
