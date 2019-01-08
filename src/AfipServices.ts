@@ -1,16 +1,15 @@
 import {IParamsFECAESolicitar, IParamsFECompUltimoAutorizado, WsServicesNames} from "./SoapMethods";
 import {AfipHelper} from "./AfipHelper";
-import * as Promise from 'bluebird'
-
 
 export interface IConfigService {
     homo: boolean;
-    certPath: string;
-    privateKeyPath: string;
+    certPath?: string | null;
+    privateKeyPath?: string | null;
+    certContents?: string | null;
+    privateKeyContents?: string | null;
     cacheTokensPath: string;
     tokensExpireInHours: number;
 }
-
 
 export class AfipServices {
 
@@ -19,7 +18,6 @@ export class AfipServices {
     constructor(private config: IConfigService) {
         this.afipHelper = new AfipHelper(config);
     }
-
 
     createBill(params: IParamsFECAESolicitar) {
         const service = `wsfev1`;

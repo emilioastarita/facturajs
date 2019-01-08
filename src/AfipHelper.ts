@@ -1,12 +1,9 @@
 import {IConfigService} from "./AfipServices";
 import {debug, parseXml, LOG, writeFile, readFile, signMessage} from "./util";
-import * as Promise from "bluebird"
 import moment = require("moment");
 import * as soap from "soap";
 import {WsServicesNames} from "./SoapMethods";
 import NTPClient from "ntpclient";
-
-
 
 interface IPromiseReadFile {
     [path: string]: Promise<string>;
@@ -177,14 +174,10 @@ export class AfipHelper {
         throw err;
     }
 
-    private signService(service: string) {
-        return Promise.all([
-            this.getNetworkHour(),
-            this.readKeys()
-        ]).then(([date, [cert, privateKey]]: [Date, [string, string]]) => {
-            return signMessage(this.getLoginXml(service, date), cert, privateKey);
-        });
-
+    private async signService(service: string) {
+        const date = await this.getNetworkHour();
+        const [cert, privateKey] = await this.readKeys();
+        return signMessage(this.getLoginXml(service, date), cert, privateKey);
     }
 
 
@@ -210,11 +203,19 @@ export class AfipHelper {
         return xml.trim();
     }
 
-    private readKeys() {
-        return Promise.all([
-            this.readFile(this.config.certPath),
-            this.readFile(this.config.privateKeyPath),
-        ])
+    private async readKeys() {
+        if (!this.config.certContents || !this.config.privateKeyContents) {
+            this.config.certContents = await this.readFile(
+                this.config.certPath as string
+            );
+            this.config.privateKeyContents = await this.readFile(
+                this.config.privateKeyPath as string
+            );
+        }
+        return [
+            this.config.certContents as string,
+            this.config.privateKeyContents as string
+        ];
     }
 
     private readFile(path: string) {
