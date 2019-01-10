@@ -97,7 +97,32 @@ afip.execRemote('wsfev1', 'FECAESolicitar', {
     }    
 }).then(res => console.log(res))
 ````
+
+#### Config
+
+Dentro de la config que se le pasa a `AfipServices` hay que pasar el path de los archivos conteniendo la private key y el certificado:
+
+```typescript
+const config: IConfigService = {
+    certPath: './private/cert.pem',
+    privateKeyPath: './private/private_key.key',
+    cacheTokensPath: './.lastTokens',
+    homo: true,
+    tokensExpireInHours: 12
+};
+```
+
+ o directamente el contenido de ellos:
  
+```typescript
+const config: IConfigService = {
+    certContents: myCertificate,
+    privateKeyContents: myPrivateKey,
+    cacheTokensPath: './.lastTokens',
+    homo: true,
+    tokensExpireInHours: 12
+};
+```
 
 #### Proyectos relacionados
 
