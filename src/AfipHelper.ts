@@ -45,7 +45,16 @@ export class AfipHelper {
     };
 
     constructor(private config: IConfigService) {
+      const hasCredentialPaths: boolean = !!(
+        config.certPath && config.privateKeyPath
+      );
+      const hasCredentialContents: boolean = !!(
+        config.certContents && config.privateKeyContents
+      );
 
+      if (!hasCredentialPaths || !hasCredentialContents) {
+        throw new Error('Missing either credential paths or contents!');
+      }
     }
 
     execMethod(service: WsServicesNames, method: string, params: any) {
