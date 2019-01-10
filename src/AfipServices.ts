@@ -1,18 +1,8 @@
 import {IParamsFECAESolicitar, IParamsFECompUltimoAutorizado, WsServicesNames} from "./SoapMethods";
-import {AfipHelper} from "./AfipHelper";
-
-export interface IConfigService {
-    homo: boolean;
-    certPath?: string | null;
-    privateKeyPath?: string | null;
-    certContents?: string | null;
-    privateKeyContents?: string | null;
-    cacheTokensPath: string;
-    tokensExpireInHours: number;
-}
+import {AfipHelper, IConfigService} from "./AfipHelper";
+export {IConfigService} from "./AfipHelper";
 
 export class AfipServices {
-
     private afipHelper: AfipHelper;
 
     constructor(private config: IConfigService) {

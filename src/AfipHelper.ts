@@ -1,4 +1,3 @@
-import {IConfigService} from "./AfipServices";
 import {debug, parseXml, LOG, writeFile, readFile, signMessage} from "./util";
 import moment = require("moment");
 import * as soap from "soap";
@@ -26,6 +25,15 @@ type ICredentialsCache = {
     [K in WsServicesNames]?: ICredential
 }
 
+export interface IConfigService {
+  homo: boolean;
+  certPath?: string | null;
+  privateKeyPath?: string | null;
+  certContents?: string | null;
+  privateKeyContents?: string | null;
+  cacheTokensPath: string;
+  tokensExpireInHours: number;
+}
 
 export class AfipHelper {
     private promiseFiles: IPromiseReadFile = {};
