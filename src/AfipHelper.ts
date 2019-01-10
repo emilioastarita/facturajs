@@ -60,7 +60,7 @@ export class AfipHelper {
         config.certContents && config.privateKeyContents
       );
 
-      if (!hasCredentialPaths || !hasCredentialContents) {
+      if (!hasCredentialPaths && !hasCredentialContents) {
         throw new Error('Missing either credential paths or contents!');
       }
     }
