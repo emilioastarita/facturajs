@@ -4,3 +4,4 @@ node_modules/*
 private/*
 .lastTokens
 yarn-error.log
+*.tgz

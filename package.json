@@ -1,9 +1,9 @@
 {
-  "name": "facturajs",
+  "name": "@mbenedettini/facturajs",
   "description": "Comunicación con los web services de AFIP utilizando nodejs.",
-  "author": "Emilio Astarita",
+  "author": "Mariano Benedettini",
   "licence": "MIT",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "engines": {
     "node": ">=6.0.0"
   },
@@ -16,13 +16,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emilioastarita/facturajs.git"
+    "url": "git+https://github.com/mbenedettini/facturajs.git"
   },
   "bugs": {
-    "url": "git+https://github.com/emilioastarita/facturajs/issues"
+    "url": "git+https://github.com/mbenedettini/facturajs/issues"
   },
   "files": [
-    "dist/*"
+    "dist"
   ],
   "keywords": [
     "afip",
