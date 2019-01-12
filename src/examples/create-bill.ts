@@ -6,8 +6,11 @@ import {AfipServices} from "../AfipServices";
 
 
 const config: IConfigService = {
-    certPath: './private/cert.pem',
-    privateKeyPath: './private/private_key.key',
+    certPath: './private/dev/cert.pem',
+    privateKeyPath: './private/dev/private_key.key',
+    // or use directly content keys if you need
+    // certContents: fs.readFileSync('./private/dev/cert.pem').toString('utf8'),
+    // privateKeyContents: fs.readFileSync('./private/dev/private_key.key').toString('utf8'),
     cacheTokensPath: './.lastTokens',
     homo: true,
     tokensExpireInHours: 12
@@ -15,8 +18,10 @@ const config: IConfigService = {
 
 const afip = new AfipServices(config);
 
+const cuit = 27310090854;
+
 afip.getLastBillNumber({
-    Auth: {Cuit: 27000000000},
+    Auth: {Cuit: cuit},
     params: {
         CbteTipo: 11,
         PtoVta: 2
@@ -29,7 +34,7 @@ afip.getLastBillNumber({
     const next = num + 1;
     console.log('Next bill number to create: ', next);
     return afip.createBill({
-        Auth: {Cuit: 27000000000},
+        Auth: {Cuit: cuit},
         params: {
             FeCAEReq: {
                 FeCabReq: {
