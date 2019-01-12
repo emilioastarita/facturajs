@@ -98,7 +98,26 @@ afip.execRemote('wsfev1', 'FECAESolicitar', {
 }).then(res => console.log(res))
 ````
  
+ 
+ 
+#### Config
+
+El constructor `AfipServices` acepta un objeto que cumpla con la interfaz de `IConfigService`. La descripción de sus propiedades:
+
+* `homo` Un booleano que determina el uso del entorno de homologación.
+* `cacheTokensPath` Path a un file dónde se cachearan los tokens obtenidos para no solicitarlos cada vez.
+* `tokensExpireInHours` La cantidad de horas en la que expirará el archivo de tokens cacheados.
+* `privateKeyContents` El contenido de la private key (no hace falta path en este caso)
+* `privateKeyPath` Path a la private key (al igual que antes podemos omitir el contenido)
+* `certContents` El contenido del certificado (no hace falta path en este caso)
+* `certPath` Path al certificado (al igual que antes podemos omitir el contenido)
+
 
 #### Proyectos relacionados
 
 - [SOAP de la AFIP a REST](https://github.com/sarriaroman/AFIP-API) enciende un server expressjs y sirve de wrapper alrededor del SOAP para poder consumir los servicios con una interfaz REST. A partir de ese repo se armó esta lib.
+
+
+#### Colaboradores
+
+* mbenedettini 

@@ -1,16 +1,11 @@
 import * as forge from "node-forge";
 import xml2js = require('xml2js');
-import * as Promise from 'bluebird'
-import * as url from "url";
-
-
+import util = require('util');
 import * as fs from "fs";
-const _debug = require('debug')('facturajs')
+const _debug = require('debug')('facturajs');
 
-
-
-export const readFile = Promise.promisify(fs.readFile);
-export const writeFile = Promise.promisify(fs.writeFile);
+export const readFile = util.promisify(fs.readFile);
+export const writeFile = util.promisify(fs.writeFile);
 
 export enum LOG {
     NONE = 1,

@@ -1,16 +1,10 @@
-import {IConfigService} from "./AfipServices";
 import {debug, parseXml, LOG, writeFile, readFile, signMessage} from "./util";
-import * as Promise from "bluebird"
 import moment = require("moment");
 import * as soap from "soap";
 import {WsServicesNames} from "./SoapMethods";
 import NTPClient from "ntpclient";
+import {IConfigService} from "./IConfigService";
 
-
-
-interface IPromiseReadFile {
-    [path: string]: Promise<string>;
-}
 
 type SoapServiceAlias = {
     [K in WsServicesNames]?: WsServicesNames;
@@ -31,7 +25,7 @@ type ICredentialsCache = {
 
 
 export class AfipHelper {
-    private promiseFiles: IPromiseReadFile = {};
+
     private tokensAliasServices: SoapServiceAlias = {
         'wsfev1': 'wsfe'
     };
@@ -81,7 +75,7 @@ export class AfipHelper {
     private getSoapClient(serviceName: WsServicesNames): any {
         const urls = this.urls[this.getAfipEnvironment()];
         const type = serviceName === 'login' ? 'login' : 'service';
-        const url = urls[type].replace('{name}', encodeURIComponent(serviceName))
+        const url = urls[type].replace('{name}', encodeURIComponent(serviceName));
         return soap.createClientAsync(url, {
             namespaceArrayElements: false
         });
@@ -177,14 +171,10 @@ export class AfipHelper {
         throw err;
     }
 
-    private signService(service: string) {
-        return Promise.all([
-            this.getNetworkHour(),
-            this.readKeys()
-        ]).then(([date, [cert, privateKey]]: [Date, [string, string]]) => {
-            return signMessage(this.getLoginXml(service, date), cert, privateKey);
-        });
-
+    private async signService(service: string) {
+        const date = await this.getNetworkHour();
+        const [cert, privateKey] = await this.getKeys();
+        return signMessage(this.getLoginXml(service, date), cert, privateKey);
     }
 
 
@@ -210,17 +200,35 @@ export class AfipHelper {
         return xml.trim();
     }
 
-    private readKeys() {
-        return Promise.all([
-            this.readFile(this.config.certPath),
-            this.readFile(this.config.privateKeyPath),
-        ])
+    private async getCert(): Promise<string> {
+        if (this.config.certContents) {
+            return this.config.certContents;
+        }
+        if (this.config.certPath) {
+            return await this.readFile(this.config.certPath);
+        }
+        throw new Error('Not cert');
     }
 
-    private readFile(path: string) {
-        if (this.promiseFiles[path]) {
-            return this.promiseFiles[path];
+    private async getPrivateKey(): Promise<string> {
+        if (this.config.privateKeyContents) {
+            return this.config.privateKeyContents;
         }
-        return readFile(path).then(buffer => buffer.toString('utf8'));
+        if (this.config.privateKeyPath) {
+            return await this.readFile(this.config.privateKeyPath);
+        }
+        throw new Error('Not private key');
     }
+
+    private async getKeys() {
+        return [
+            await this.getCert(),
+            await this.getPrivateKey()
+        ]
+    }
+
+    private async readFile(path: string): Promise<string> {
+        return (await readFile(path)).toString('utf8');
+    }
+
 }

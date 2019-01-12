@@ -1,15 +1,6 @@
 import {IParamsFECAESolicitar, IParamsFECompUltimoAutorizado, WsServicesNames} from "./SoapMethods";
 import {AfipHelper} from "./AfipHelper";
-import * as Promise from 'bluebird'
-
-
-export interface IConfigService {
-    homo: boolean;
-    certPath: string;
-    privateKeyPath: string;
-    cacheTokensPath: string;
-    tokensExpireInHours: number;
-}
+import {IConfigService} from "./IConfigService";
 
 
 export class AfipServices {
@@ -33,7 +24,7 @@ export class AfipServices {
         return this.afipHelper.execMethod(service, method, params)
     }
 
-    execRemote(service : string, method : string, params : any) {
+    execRemote(service: string, method: string, params: any) {
         return this.afipHelper.execMethod(<WsServicesNames>service, method, params);
     }
 

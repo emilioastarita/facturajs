@@ -3,7 +3,7 @@
   "description": "Comunicación con los web services de AFIP utilizando nodejs.",
   "author": "Emilio Astarita",
   "licence": "MIT",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "engines": {
     "node": ">=6.0.0"
   },
@@ -35,14 +35,13 @@
     "nodejs"
   ],
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "debug": "^3.1.0",
+    "debug": "^4.1.1",
     "moment": "^2.13.0",
     "node-forge": "^0.7.5",
-    "ntpclient": "^0.6.1",
-    "soap": "^0.24.0",
+    "ntpclient": "^0.7.2",
+    "soap": "^0.25.0",
     "source-map-support": "^0.5.4",
-    "uniqid": "^4.1.1",
+    "uniqid": "^5.0.3",
     "xml2js": "^0.4.16"
   },
   "devDependencies": {
@@ -50,6 +49,6 @@
     "@types/node-forge": "^0.7.2",
     "@types/uniqid": "^4.1.2",
     "@types/xml2js": "^0.4.2",
-    "typescript": "^2.8.3"
+    "typescript": "^3.2.2"
   }
 }

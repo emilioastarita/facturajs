@@ -1,6 +1,8 @@
+import {IConfigService} from "../IConfigService";
+
 require('source-map-support').install();
 import moment = require("moment");
-import {AfipServices, IConfigService} from "../AfipServices";
+import {AfipServices} from "../AfipServices";
 
 
 const config: IConfigService = {
