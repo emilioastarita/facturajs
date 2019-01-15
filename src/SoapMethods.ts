@@ -1,20 +1,19 @@
-export type WsServicesNames = 'wsfe' | 'wsfev1' | 'login';
+export type WsServicesNames = "wsfe" | "wsfev1" | "login";
 
 export interface IParamsAuth {
     Auth?: {
         token?: string;
         sign?: string;
         Cuit: number;
-    }
+    };
 }
 
 export interface IParamsFECompUltimoAutorizado extends IParamsAuth {
     params: {
         PtoVta: number;
         CbteTipo: number;
-    }
+    };
 }
-
 
 export interface IParamsFECAESolicitar extends IParamsAuth {
     params: {
@@ -38,11 +37,11 @@ export interface IParamsFECAESolicitar extends IParamsAuth {
                     ImpOpEx: number;
                     ImpIva: number;
                     ImpTrib: number;
-                    MonId: 'PES'
+                    MonId: "PES"
                     MonCotiz: number;
-                }
-            }
-        }
+                },
+            },
+        },
 
-    }
+    };
 }

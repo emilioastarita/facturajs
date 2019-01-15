@@ -16,9 +16,7 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
     & Partial<Record<Exclude<Keys, K>, undefined>>
 }[Keys];
 
-
 export type IConfigService =
     RequireOnlyOne<IConfigServiceBasics, "privateKeyContents" | "privateKeyPath">
     &
     RequireOnlyOne<(IConfigServiceBasics), "certPath" | "certContents">;
-
