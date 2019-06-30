@@ -13,13 +13,13 @@ export class AfipServices {
     public createBill(params: IParamsFECAESolicitar) {
         const service = `wsfev1`;
         const method = `FECAESolicitar`;
-        return this.afipHelper.execMethod(service, method, params)
+        return this.afipHelper.execMethod(service, method, params);
     }
 
     public getLastBillNumber(params: IParamsFECompUltimoAutorizado) {
         const service = `wsfev1`;
         const method = `FECompUltimoAutorizado`;
-        return this.afipHelper.execMethod(service, method, params)
+        return this.afipHelper.execMethod(service, method, params);
     }
 
     private execRemote(service: string, method: string, params: any) {
