@@ -53,7 +53,7 @@ afip.getLastBillNumber({
                         ImpTotConc: 0,
                         ImpNeto: 75.0,
                         ImpOpEx: 0,
-                        ImpIva: 0,
+                        ImpIVA: 0,
                         ImpTrib: 0,
                         MonId: "PES",
                         MonCotiz: 1,
