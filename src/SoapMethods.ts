@@ -39,6 +39,13 @@ export interface IParamsFECAESolicitar extends IParamsAuth {
                     ImpTrib: number;
                     MonId: 'PES';
                     MonCotiz: number;
+                    Iva?: {
+                        AlicIva: {
+                            Id: number;
+                            BaseImp: number;
+                            Importe: number;
+                        };
+                    }[];
                 };
             };
         };

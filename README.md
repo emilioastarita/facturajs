@@ -51,7 +51,7 @@ En este ejemplo pueden [ver como crear una factura electrónica con el último n
 Para poder ver más en detalle que está sucediendo se puede configurar el `LOG_LEVEL` y namespace de `DEBUG`:
 
 ```bash
-~$ LOG_LEVEL=3 DEBUG=facturajs node dist/examples/create-bill.js
+~$ LOG_LEVEL=3 DEBUG=facturajs node dist/examples/create-bill-monotributo.js
 # Salida:
 # Last bill number:  43
 # Next bill number to create:  44
