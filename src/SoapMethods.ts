@@ -1,4 +1,4 @@
-export type WsServicesNames = "wsfe" | "wsfev1" | "login";
+export type WsServicesNames = 'wsfe' | 'wsfev1' | 'login';
 
 export interface IParamsAuth {
     Auth?: {
@@ -22,7 +22,7 @@ export interface IParamsFECAESolicitar extends IParamsAuth {
                 CantReg: number;
                 PtoVta: number;
                 CbteTipo: number;
-            }
+            };
             FeDetReq: {
                 FECAEDetRequest: {
                     DocTipo: number;
@@ -37,11 +37,10 @@ export interface IParamsFECAESolicitar extends IParamsAuth {
                     ImpOpEx: number;
                     ImpIVA: number;
                     ImpTrib: number;
-                    MonId: "PES"
+                    MonId: 'PES';
                     MonCotiz: number;
-                },
-            },
-        },
-
+                };
+            };
+        };
     };
 }

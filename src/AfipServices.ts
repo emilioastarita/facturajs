@@ -1,9 +1,12 @@
-import {AfipHelper} from "./AfipHelper";
-import {IConfigService} from "./IConfigService";
-import {IParamsFECAESolicitar, IParamsFECompUltimoAutorizado, WsServicesNames} from "./SoapMethods";
+import { AfipHelper } from './AfipHelper';
+import { IConfigService } from './IConfigService';
+import {
+    IParamsFECAESolicitar,
+    IParamsFECompUltimoAutorizado,
+    WsServicesNames,
+} from './SoapMethods';
 
 export class AfipServices {
-
     private afipHelper: AfipHelper;
 
     constructor(private config: IConfigService) {
@@ -23,7 +26,10 @@ export class AfipServices {
     }
 
     private execRemote(service: string, method: string, params: any) {
-        return this.afipHelper.execMethod(service as WsServicesNames, method, params);
+        return this.afipHelper.execMethod(
+            service as WsServicesNames,
+            method,
+            params
+        );
     }
-
 }
