@@ -32,11 +32,11 @@ export function debug(level: number, ...rest: any[]) {
     return debugLib(...rest);
 }
 
-export function parseXml(xml: string) {
+export function parseXml<T>(xml: string) {
     const options = {
         explicitArray: false,
     };
-    return new Promise((resolve, reject) => {
+    return new Promise<T>((resolve, reject) => {
         xml2js.parseString(xml, options, (err, parsed) => {
             if (err) {
                 reject(err);
@@ -45,6 +45,13 @@ export function parseXml(xml: string) {
             }
         });
     });
+}
+
+export async function readStringFromFile(
+    path: string,
+    encoding = 'utf8'
+): Promise<string> {
+    return (await readFile(path)).toString(encoding);
 }
 
 export function signMessage(
