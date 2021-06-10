@@ -1,6 +1,5 @@
 ![facturajs](facturajs.jpg?raw=true&1 "FacturaJS")
 
-
 # facturajs
 
 Afip Web Services desde nodejs.
@@ -40,9 +39,8 @@ De nuestro lado lo primero es generar certificados relacionados a nuestro CUIT:
 
 En este [pdf (WSASS como adherirse)](https://www.afip.gob.ar/ws/WSASS/WSASS_como_adherirse.pdf) pueden ver el proceso de adhesión al servicio de homologación. Básicamente das de alta el servicio y le cargas el CSR generado en el paso anterior, la página web te va a entregar otro cert que lo tenes que copiar y lo guardas en un archivo de texto: `private/cert.pem`. El último paso, en esa misma página, sería autorizar tu cert al servicio que quieras usar. En mi caso quería el de facturas digitales llamado: `wsfe`. 
 
-
-
 ### Ejemplo de uso  
+
 
 #### Crear una factura electrónica
 
@@ -111,6 +109,17 @@ El constructor `AfipServices` acepta un objeto que cumpla con la interfaz de `IC
 * `privateKeyPath` Path a la private key (al igual que antes podemos omitir el contenido)
 * `certContents` El contenido del certificado (no hace falta path en este caso)
 * `certPath` Path al certificado (al igual que antes podemos omitir el contenido)
+
+
+#### Nota acerca de métodos de cifrado openssl
+
+En algunos sistemas operativos con una versión de la configuración de openssl mas nueva
+se reportó un error porque openssl rechaza los métodos de cifrado de AFIP.
+Algunos usuarios reportaron que en un sistema Debian la solución fue editar `/etc/ssl/openssl.cnf`.
+Y comentar la siguiente línea:
+```
+# CipherString = DEFAULT@SECLEVEL=2
+```
 
 
 #### Proyectos relacionados
