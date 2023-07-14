@@ -1,14 +1,13 @@
 import * as fs from 'fs';
 import * as forge from 'node-forge';
-import util = require('util');
-import xml2js = require('xml2js');
-
+import xml2js from 'xml2js';
+import debugInit from 'debug';
 const LOG_RUNTIME_LEVEL: LOG = parseProcessLevel();
 const LOG_NAMESPACE = 'facturajs';
-const debugLib = require('debug')(LOG_NAMESPACE);
+const debugLib = debugInit(LOG_NAMESPACE);
 
-export const readFile = util.promisify(fs.readFile);
-export const writeFile = util.promisify(fs.writeFile);
+export const readFile = fs.promises.readFile;
+export const writeFile = fs.promises.writeFile;
 
 export const enum LOG {
     NONE = 1,
@@ -29,6 +28,7 @@ export function debug(level: number, ...rest: any[]) {
     if (LOG_RUNTIME_LEVEL < level) {
         return;
     }
+    //@ts-expect-error not typed
     return debugLib(...rest);
 }
 

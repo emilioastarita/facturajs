@@ -1,7 +1,7 @@
-import moment = require('moment');
 import 'source-map-support/register';
 import { AfipServices } from '../AfipServices';
 import { IConfigService } from '../IConfigService';
+import moment from 'moment';
 
 const config: IConfigService = {
     certPath: './private/dev/cert.pem',

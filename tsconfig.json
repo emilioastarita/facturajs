@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "lib": ["es2022"],
+    "module": "esnext",
+    "target": "es2022",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
     "strict": true,
@@ -15,7 +18,8 @@
     "*.ts"
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "node_modules/ntpclient/dist/cjs/**/*"
   ],
   "exclude": [
     "node_modules",

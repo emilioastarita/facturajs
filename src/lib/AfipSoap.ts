@@ -1,4 +1,4 @@
-import moment = require('moment');
+import moment from 'moment';
 import * as soap from 'soap';
 import { IConfigService } from '../IConfigService';
 import { WsServicesNames } from '../SoapMethods';
@@ -10,11 +10,12 @@ import {
     signMessage,
     writeFile,
 } from '../util';
-import { NTPClient } from 'ntpclient';
+import { NtpTimeSync } from "ntp-time-sync";
 
 type SoapServiceAlias = {
     [K in WsServicesNames]?: WsServicesNames;
 };
+
 interface ICredential {
     tokens: {
         token: string;
@@ -84,14 +85,18 @@ export class AfipSoap {
         try {
             const raw = await readStringFromFile(path);
             return JSON.parse(raw) as ICredentialsCache;
-        } catch (e) {
-            if (e.code === 'ENOENT') {
+        } catch (e: unknown) {
+            if (this.isErrnoException(e) && e.code === 'ENOENT') {
                 debug(LOG.WARN, 'Cache file does not exists.');
             } else {
                 debug(LOG.ERROR, 'Fail to read cache file: ', e);
             }
             return {};
         }
+    }
+
+    private static isErrnoException(e: unknown): e is NodeJS.ErrnoException {
+        return 'code' in (e as any);
     }
 
     private getLoginXml(service: string, networkTime: Date): string {
@@ -121,8 +126,12 @@ export class AfipSoap {
         return signMessage(this.getLoginXml(service, date), cert, privateKey);
     }
 
-    private static getNetworkHour(): Promise<Date> {
-        return new NTPClient('time.afip.gov.ar', 123).getNetworkTime();
+    private static async getNetworkHour(): Promise<Date> {
+        const timeSync = NtpTimeSync.getInstance({
+            servers: ['time.afip.gov.ar'],
+        });
+        const res = await timeSync.getTime();
+        return res.now;
     }
 
     private async getKeys() {
