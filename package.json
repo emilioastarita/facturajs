@@ -3,7 +3,7 @@
   "description": "Comunicación con los web services de AFIP utilizando nodejs.",
   "author": "Emilio Astarita",
   "licence": "MIT",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "engines": {
     "node": ">=6.0.0"
   },
@@ -25,7 +25,7 @@
     "url": "git+https://github.com/emilioastarita/facturajs/issues"
   },
   "files": [
-    "./dist/"
+    "dist/"
   ],
   "keywords": [
     "afip",

@@ -10,7 +10,7 @@ import {
     signMessage,
     writeFile,
 } from '../util';
-import { NtpTimeSync } from "ntp-time-sync";
+import { NtpTimeSync } from 'ntp-time-sync';
 
 type SoapServiceAlias = {
     [K in WsServicesNames]?: WsServicesNames;
