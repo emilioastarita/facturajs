@@ -5,7 +5,7 @@
   "licence": "MIT",
   "version": "0.2.0",
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=12.0.0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,43 +13,31 @@
     "prettier": "prettier --write \"src/**/*.{md,json,ts}\"",
     "build": "tsc",
     "clean": "rm -rf dist/*",
-    "prepare": "yarn prettier; yarn clean ; yarn build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/emilioastarita/facturajs.git"
-  },
-  "bugs": {
-    "url": "git+https://github.com/emilioastarita/facturajs/issues"
+    "prepare": "npm run clean ; npm run build"
   },
   "files": [
     "./dist/"
   ],
-  "keywords": [
-    "afip",
-    "factura",
-    "factura electrónica",
-    "wsfe",
-    "wsfev1",
-    "web service",
-    "soap",
-    "nodejs"
-  ],
   "dependencies": {
     "debug": "^4.3.1",
     "moment": "^2.29.1",
-    "node-forge": "^0.10.0",
-    "ntpclient": "^1.1.2",
-    "soap": "^0.37.0",
+    "node-forge": "1.3.1",
+    "ntpclient": "^1.0.2",
+    "soap": "1.0.0",
     "source-map-support": "^0.5.19",
-    "uniqid": "^5.3.0",
-    "xml2js": "^0.4.23"
+    "uniqid": "^5.2.0",
+    "xml2js": "0.6.2",
+    "xlsx": "0.18.5",
+    "lodash": "^4.17.21",
+    "purify-ts": "^1.1.0"
   },
   "devDependencies": {
-    "@types/node-forge": "^0.9.7",
-    "@types/uniqid": "^5.3.0",
-    "@types/xml2js": "^0.4.8",
+    "@types/node-forge": "^0.9.6",
+    "@types/uniqid": "^5.2.0",
+    "@types/xml2js": "^0.4.7",
+    "@types/lodash": "^4.14.178",
+    "@types/request": "^2.48.8",
     "prettier": "^2.2.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.1.3"
   }
 }

@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "esModuleInterop": true,
+    "incremental": false,
+    "target": "es2019",
     "module": "commonjs",
     "skipLibCheck": true,
     "declaration": true,

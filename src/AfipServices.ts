@@ -1,33 +1,35 @@
+import { AfipHelper } from './AfipHelper';
 import { IConfigService } from './IConfigService';
 import {
-    IParamsFECAESolicitar,
-    IParamsFECompUltimoAutorizado,
+    FECAESolicitarResult,
+    FECompUltimoAutorizadoResult,
+    ParamsFECAESolicitar,
+    ParamsFECompUltimoAutorizado,
     WsServicesNames,
 } from './SoapMethods';
-import { AfipSoap } from './lib/AfipSoap';
 
 export class AfipServices {
-    private afipSoap: AfipSoap;
+    private afipHelper: AfipHelper;
 
     constructor(private config: IConfigService) {
-        this.afipSoap = new AfipSoap(config);
+        this.afipHelper = new AfipHelper(config);
     }
 
-    public createBill(params: IParamsFECAESolicitar) {
-        const service = `wsfev1`;
-        const method = `FECAESolicitar`;
-        return this.afipSoap.execMethod(service, method, params);
+    public createBill(params: ParamsFECAESolicitar): Promise<FECAESolicitarResult> {
+        const service = "wsfev1";
+        const method = "FECAESolicitar";
+        return this.afipHelper.execMethod(service, method, params);
     }
 
-    public getLastBillNumber(params: IParamsFECompUltimoAutorizado) {
-        const service = `wsfev1`;
-        const method = `FECompUltimoAutorizado`;
-        return this.afipSoap.execMethod(service, method, params);
+    public getLastBillNumber(params: ParamsFECompUltimoAutorizado): Promise<FECompUltimoAutorizadoResult> {
+        const service = "wsfev1";
+        const method = "FECompUltimoAutorizado";
+        return this.afipHelper.execMethod(service, method, params);
     }
 
-    public execRemote(service: string, method: string, params: any) {
-        return this.afipSoap.execMethod(
-            service as WsServicesNames,
+    public execRemote(service: WsServicesNames, method: string, params: any): Promise<any> {
+        return this.afipHelper.execMethod(
+            service,
             method,
             params
         );

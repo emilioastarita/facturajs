@@ -1,6 +1,6 @@
 export type WsServicesNames = 'wsfe' | 'wsfev1' | 'login';
 
-export interface IParamsAuth {
+export interface ParamsAuth {
     Auth?: {
         token?: string;
         sign?: string;
@@ -8,14 +8,14 @@ export interface IParamsAuth {
     };
 }
 
-export interface IParamsFECompUltimoAutorizado extends IParamsAuth {
+export interface ParamsFECompUltimoAutorizado extends ParamsAuth {
     params: {
         PtoVta: number;
         CbteTipo: number;
     };
 }
 
-export interface IParamsFECAESolicitar extends IParamsAuth {
+export interface ParamsFECAESolicitar extends ParamsAuth {
     params: {
         FeCAEReq: {
             FeCabReq: {
@@ -50,4 +50,44 @@ export interface IParamsFECAESolicitar extends IParamsAuth {
             };
         };
     };
+};
+
+export interface FeCabResp {
+    Cuit: string;
+    PtoVta: number;
+    CbteTipo: number;
+    FchProceso: string;
+    CantReg: number;
+    Resultado: string;
+    Reproceso?: string;
+};
+
+export interface FECAEDetResponse {
+    Concepto: number;
+    DocTipo: number;
+    DocNro: string;
+    CbteDesde: string;
+    CbteHasta: string;
+    CbteFch?: string;
+    Resultado: string;
+    CAE?: string;
+    CAEFchVto?: string;
+    Observaciones?: Array<{ Code: number; Msg: string; }>;
+};
+
+export interface FeDetResp {
+    FECAEDetResponse: Array<FECAEDetResponse>;
+};
+
+export interface FECAESolicitarResult {
+    FeCabResp: FeCabResp,
+    FeDetResp: FeDetResp,
+    // Events
+    // Errors
+};
+
+export interface FECompUltimoAutorizadoResult {
+    PtoVta: number;
+    CbteTipo: number;
+    CbteNro?: number;
 }
