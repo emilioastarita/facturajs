@@ -31,7 +31,9 @@ type ICredentialsCache = {
 };
 
 type SoapRequestArgs = Parameters<soap.HttpClient['request']>;
-type SoapRequestStreamArgs = Parameters<NonNullable<soap.HttpClient['requestStream']>>;
+type SoapRequestStreamArgs = Parameters<
+    NonNullable<soap.HttpClient['requestStream']>
+>;
 
 interface IRemoteMethodParams {
     Auth?: Record<string, unknown>;
@@ -340,7 +342,9 @@ export class AfipSoap {
         debug(LOG.INFO, 'execMethod params with AUTH', params);
         const client = await this.getSoapClient(service);
         const call = client[method + 'Async'] as
-            | ((args: Record<string, unknown>) => Promise<[Record<string, unknown>, unknown]>)
+            | ((
+                  args: Record<string, unknown>
+              ) => Promise<[Record<string, unknown>, unknown]>)
             | undefined;
 
         if (!call) {

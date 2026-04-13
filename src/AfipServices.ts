@@ -26,7 +26,11 @@ export class AfipServices {
     ): Promise<IResponseFECompUltimoAutorizado> {
         const service = `wsfev1`;
         const method = `FECompUltimoAutorizado`;
-        return this.afipSoap.execMethod(service, method, params) as Promise<IResponseFECompUltimoAutorizado>;
+        return this.afipSoap.execMethod(
+            service,
+            method,
+            params
+        ) as Promise<IResponseFECompUltimoAutorizado>;
     }
 
     public getVatReceiverConditions(
