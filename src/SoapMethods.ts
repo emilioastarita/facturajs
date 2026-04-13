@@ -15,6 +15,11 @@ export interface IParamsFECompUltimoAutorizado extends IParamsAuth {
     };
 }
 
+export interface IResponseFECompUltimoAutorizado {
+    CbteNro: number;
+    [key: string]: unknown;
+}
+
 export interface IParamsFEParamGetCondicionIvaReceptor extends IParamsAuth {
     params?: {
         ClaseCmp?: 'A' | 'B' | 'C' | 'M';

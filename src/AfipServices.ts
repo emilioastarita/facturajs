@@ -3,6 +3,7 @@ import {
     IParamsFECAESolicitar,
     IParamsFECompUltimoAutorizado,
     IParamsFEParamGetCondicionIvaReceptor,
+    IResponseFECompUltimoAutorizado,
     WsServicesNames,
 } from './SoapMethods';
 import { AfipSoap } from './lib/AfipSoap';
@@ -20,10 +21,12 @@ export class AfipServices {
         return this.afipSoap.execMethod(service, method, params);
     }
 
-    public getLastBillNumber(params: IParamsFECompUltimoAutorizado) {
+    public getLastBillNumber(
+        params: IParamsFECompUltimoAutorizado
+    ): Promise<IResponseFECompUltimoAutorizado> {
         const service = `wsfev1`;
         const method = `FECompUltimoAutorizado`;
-        return this.afipSoap.execMethod(service, method, params);
+        return this.afipSoap.execMethod(service, method, params) as Promise<IResponseFECompUltimoAutorizado>;
     }
 
     public getVatReceiverConditions(
@@ -34,11 +37,18 @@ export class AfipServices {
         return this.afipSoap.execMethod(service, method, params);
     }
 
-    public execRemote(service: string, method: string, params: any) {
+    public execRemote<TResponse = unknown>(
+        service: string,
+        method: string,
+        params: {
+            Auth?: Record<string, unknown>;
+            params?: Record<string, unknown>;
+        }
+    ): Promise<TResponse> {
         return this.afipSoap.execMethod(
             service as WsServicesNames,
             method,
             params
-        );
+        ) as Promise<TResponse>;
     }
 }

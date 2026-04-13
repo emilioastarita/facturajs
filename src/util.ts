@@ -2,6 +2,12 @@ import * as fs from 'fs';
 import * as forge from 'node-forge';
 import xml2js from 'xml2js';
 import debugInit from 'debug';
+
+type ForgeAuthenticatedAttribute = {
+    type: string;
+    value?: string | Date;
+};
+
 const LOG_RUNTIME_LEVEL: LOG = parseProcessLevel();
 const LOG_NAMESPACE = 'facturajs';
 const debugLib = debugInit(LOG_NAMESPACE);
@@ -24,12 +30,11 @@ function parseProcessLevel(): LOG {
     return LOG.INFO;
 }
 
-export function debug(level: number, ...rest: any[]) {
+export function debug(level: number, ...rest: unknown[]) {
     if (LOG_RUNTIME_LEVEL < level) {
         return;
     }
-    //@ts-expect-error not typed
-    return debugLib(...rest);
+    return (debugLib as (...args: unknown[]) => void)(...rest);
 }
 
 export function parseXml<T>(xml: string) {
@@ -59,23 +64,28 @@ export function signMessage(
     cert: string,
     privateKey: string
 ): string {
-    const p7 = (forge as any).pkcs7.createSignedData();
+    const p7 = forge.pkcs7.createSignedData();
+    const authenticatedAttributes: ForgeAuthenticatedAttribute[] = [
+        {
+            type: forge.pki.oids.contentType,
+            value: forge.pki.oids.data,
+        },
+        {
+            type: forge.pki.oids.messageDigest,
+        },
+        {
+            type: forge.pki.oids.signingTime,
+            value: new Date(),
+        },
+    ];
+
     p7.content = forge.util.createBuffer(message, 'utf8');
     p7.addCertificate(cert);
     p7.addSigner({
-        authenticatedAttributes: [
-            {
-                type: forge.pki.oids.contentType,
-                value: forge.pki.oids.data,
-            },
-            {
-                type: forge.pki.oids.messageDigest,
-            },
-            {
-                type: forge.pki.oids.signingTime,
-                value: new Date(),
-            },
-        ],
+        authenticatedAttributes: authenticatedAttributes as unknown as Array<{
+            type: string;
+            value?: string;
+        }>,
         certificate: cert,
         digestAlgorithm: forge.pki.oids.sha256,
         key: privateKey,

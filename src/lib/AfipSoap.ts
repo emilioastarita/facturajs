@@ -30,6 +30,33 @@ type ICredentialsCache = {
     [K in WsServicesNames]?: ICredential;
 };
 
+type SoapRequestArgs = Parameters<soap.HttpClient['request']>;
+type SoapRequestStreamArgs = Parameters<NonNullable<soap.HttpClient['requestStream']>>;
+
+interface IRemoteMethodParams {
+    Auth?: Record<string, unknown>;
+    params?: Record<string, unknown>;
+}
+
+interface ILoginCmsResponse {
+    loginCmsReturn: string;
+}
+
+interface IAfipErrorItem {
+    Code: string | number;
+    Msg: string;
+}
+
+interface IAfipErrorResponse {
+    Errors?: {
+        Err?: IAfipErrorItem[];
+    };
+}
+
+interface IAfipResponseError extends Error {
+    code: string | number;
+}
+
 class ConfiguredHttpClient extends soap.HttpClient {
     constructor(
         private readonly defaultRequestOptions: Record<string, unknown>,
@@ -39,12 +66,12 @@ class ConfiguredHttpClient extends soap.HttpClient {
     }
 
     request(
-        rurl: string,
-        data: any,
-        callback: (error: any, res?: any, body?: any) => any,
-        exheaders?: any,
-        exoptions?: any,
-        caller?: any
+        rurl: SoapRequestArgs[0],
+        data: SoapRequestArgs[1],
+        callback: SoapRequestArgs[2],
+        exheaders?: SoapRequestArgs[3],
+        exoptions?: SoapRequestArgs[4],
+        _caller?: unknown
     ) {
         return super.request(rurl, data, callback, exheaders, {
             ...this.defaultRequestOptions,
@@ -53,11 +80,11 @@ class ConfiguredHttpClient extends soap.HttpClient {
     }
 
     requestStream(
-        rurl: string,
-        data: any,
-        exheaders?: any,
-        exoptions?: any,
-        caller?: any
+        rurl: SoapRequestStreamArgs[0],
+        data: SoapRequestStreamArgs[1],
+        exheaders?: SoapRequestStreamArgs[2],
+        exoptions?: SoapRequestStreamArgs[3],
+        _caller?: unknown
     ) {
         return super.requestStream(rurl, data, exheaders, {
             ...this.defaultRequestOptions,
@@ -154,7 +181,7 @@ export class AfipSoap {
     }
 
     private static isErrnoException(e: unknown): e is NodeJS.ErrnoException {
-        return 'code' in (e as any);
+        return typeof e === 'object' && e !== null && 'code' in e;
     }
 
     private getLoginXml(service: string, networkTime: Date): string {
@@ -216,7 +243,7 @@ export class AfipSoap {
         throw new Error('Not private key');
     }
 
-    private getSoapClient(serviceName: WsServicesNames) {
+    private getSoapClient(serviceName: WsServicesNames): Promise<soap.Client> {
         const urls = this.urls[this.getAfipEnvironment()];
         const type = serviceName === 'login' ? 'login' : 'service';
         const url = urls[type].replace(
@@ -251,8 +278,10 @@ export class AfipSoap {
             this.getSoapClient('login'),
         ]);
         debug(LOG.INFO, 'Asking tokens from network');
-        const result: [any] = await client.loginCmsAsync({ in0: signedData });
-        const loginCmsReturn: string = result[0].loginCmsReturn;
+        const [result]: [ILoginCmsResponse] = await client.loginCmsAsync({
+            in0: signedData,
+        });
+        const loginCmsReturn = result.loginCmsReturn;
         const res = await parseXml<{
             loginTicketResponse: {
                 credentials: {
@@ -293,8 +322,8 @@ export class AfipSoap {
     public async execMethod(
         service: WsServicesNames,
         method: string,
-        params: any
-    ) {
+        params: IRemoteMethodParams
+    ): Promise<unknown> {
         debug(LOG.INFO, 'execMethod name', method);
         debug(LOG.INFO, 'execMethod params', params);
         const cred = await this.getTokens(service);
@@ -310,7 +339,14 @@ export class AfipSoap {
         };
         debug(LOG.INFO, 'execMethod params with AUTH', params);
         const client = await this.getSoapClient(service);
-        const call = client[method + 'Async'];
+        const call = client[method + 'Async'] as
+            | ((args: Record<string, unknown>) => Promise<[Record<string, unknown>, unknown]>)
+            | undefined;
+
+        if (!call) {
+            throw new Error(`SOAP method not found: ${method}Async`);
+        }
+
         const [result, rawResponse] = await call(paramsWithAuth);
         debug(LOG.DEBUG, 'execMethod rawResponse', rawResponse);
         const methodResponse = result[method + 'Result'];
@@ -318,15 +354,17 @@ export class AfipSoap {
         return methodResponse;
     }
 
-    private static throwOnError(response: any) {
-        if (!response.Errors) {
+    private static throwOnError(response: unknown): void {
+        const errorResponse = response as IAfipErrorResponse;
+
+        if (!errorResponse.Errors) {
             return;
         }
-        if (!response.Errors.Err) {
+        if (!errorResponse.Errors.Err) {
             return;
         }
-        const resErr = response.Errors.Err[0];
-        const err: any = new Error(resErr.Msg);
+        const resErr = errorResponse.Errors.Err[0];
+        const err = new Error(resErr.Msg) as IAfipResponseError;
         err.name = 'AfipResponseError';
         err.code = resErr.Code;
         throw err;
