@@ -1,3 +1,4 @@
+import { Agent, AgentOptions } from 'https';
 import moment from 'moment';
 import * as soap from 'soap';
 import { IConfigService } from '../IConfigService';
@@ -29,6 +30,55 @@ type ICredentialsCache = {
     [K in WsServicesNames]?: ICredential;
 };
 
+class ConfiguredHttpClient extends soap.HttpClient {
+    constructor(
+        private readonly defaultRequestOptions: Record<string, unknown>,
+        options?: soap.IOptions
+    ) {
+        super(options);
+    }
+
+    request(
+        rurl: string,
+        data: any,
+        callback: (error: any, res?: any, body?: any) => any,
+        exheaders?: any,
+        exoptions?: any,
+        caller?: any
+    ) {
+        return super.request(
+            rurl,
+            data,
+            callback,
+            exheaders,
+            {
+                ...this.defaultRequestOptions,
+                ...exoptions,
+            },
+            caller
+        );
+    }
+
+    requestStream(
+        rurl: string,
+        data: any,
+        exheaders?: any,
+        exoptions?: any,
+        caller?: any
+    ) {
+        return super.requestStream(
+            rurl,
+            data,
+            exheaders,
+            {
+                ...this.defaultRequestOptions,
+                ...exoptions,
+            },
+            caller
+        );
+    }
+}
+
 export class AfipSoap {
     private tokensAliasServices: SoapServiceAlias = {
         wsfev1: 'wsfe',
@@ -45,6 +95,27 @@ export class AfipSoap {
     };
 
     constructor(private config: IConfigService) {}
+
+    private getTlsRequestOptions(): Record<string, unknown> {
+        const tlsRequestOptions: AgentOptions = {
+            ...(this.config.tlsRequestOptions || {}),
+        };
+
+        if (
+            this.config.useLegacyTls !== false &&
+            typeof tlsRequestOptions.ciphers === 'undefined'
+        ) {
+            tlsRequestOptions.ciphers = 'DEFAULT@SECLEVEL=1';
+        }
+
+        if (Object.keys(tlsRequestOptions).length === 0) {
+            return {};
+        }
+
+        return {
+            httpsAgent: new Agent(tlsRequestOptions),
+        };
+    }
 
     private async getTokens(service: WsServicesNames): Promise<ICredential> {
         const aliasedService = this.tokensAliasServices[service] || service;
@@ -165,10 +236,20 @@ export class AfipSoap {
             '{name}',
             encodeURIComponent(serviceName)
         );
-
-        return soap.createClientAsync(url, {
+        const tlsRequestOptions = this.getTlsRequestOptions();
+        const options: soap.IOptions = {
             namespaceArrayElements: false,
-        });
+        };
+
+        if (Object.keys(tlsRequestOptions).length > 0) {
+            options.wsdl_options = tlsRequestOptions;
+            options.httpClient = new ConfiguredHttpClient(
+                tlsRequestOptions,
+                options
+            );
+        }
+
+        return soap.createClientAsync(url, options);
     }
 
     private getAfipEnvironment(): 'homo' | 'prod' {

@@ -109,6 +109,8 @@ El constructor `AfipServices` acepta un objeto que cumpla con la interfaz de `IC
 * `privateKeyPath` Path a la private key (al igual que antes podemos omitir el contenido)
 * `certContents` El contenido del certificado (no hace falta path en este caso)
 * `certPath` Path al certificado (al igual que antes podemos omitir el contenido)
+* `useLegacyTls` Habilita o deshabilita la configuración de compatibilidad TLS para servidores AFIP viejos. Por defecto está activada. En Node 24 puede destrabar errores como `dh key too small`. Si querés desactivarla, usá `false`.
+* `tlsRequestOptions` Opciones avanzadas para el `https.Agent` usado por las llamadas SOAP/WSDL. Sirve para sobreescribir manualmente opciones TLS si hace falta.
 
 
 #### Nota acerca de métodos de cifrado openssl
@@ -119,6 +121,46 @@ Algunos usuarios reportaron que en un sistema Debian la solución fue editar `/e
 Y comentar la siguiente línea:
 ```
 # CipherString = DEFAULT@SECLEVEL=2
+```
+
+Ahora la librería ya aplica por defecto una configuración de compatibilidad TLS, sin tocar la configuración global del sistema:
+
+```typescript
+const afip = new AfipServices({
+    homo: true,
+    cacheTokensPath: './tmp/tokens.json',
+    tokensExpireInHours: 12,
+    privateKeyPath: './private/private_key.key',
+    certPath: './private/cert.pem',
+});
+```
+
+Si necesitás desactivarla explícitamente:
+
+```typescript
+const afip = new AfipServices({
+    homo: true,
+    cacheTokensPath: './tmp/tokens.json',
+    tokensExpireInHours: 12,
+    privateKeyPath: './private/private_key.key',
+    certPath: './private/cert.pem',
+    useLegacyTls: false,
+});
+```
+
+Si necesitás más control, podés pasar opciones manuales:
+
+```typescript
+const afip = new AfipServices({
+    homo: true,
+    cacheTokensPath: './tmp/tokens.json',
+    tokensExpireInHours: 12,
+    privateKeyPath: './private/private_key.key',
+    certPath: './private/cert.pem',
+    tlsRequestOptions: {
+        ciphers: 'DEFAULT@SECLEVEL=1',
+    },
+});
 ```
 
 

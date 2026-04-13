@@ -1,3 +1,5 @@
+import { AgentOptions } from 'https';
+
 export interface IConfigServiceBasics {
     homo: boolean;
     cacheTokensPath: string;
@@ -6,6 +8,8 @@ export interface IConfigServiceBasics {
     privateKeyPath?: string;
     certPath?: string;
     certContents?: string;
+    useLegacyTls?: boolean;
+    tlsRequestOptions?: AgentOptions;
 }
 
 export type RequireOnlyOne<T, Keys extends keyof T = keyof T> = Pick<
