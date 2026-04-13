@@ -3,7 +3,7 @@
   "description": "Comunicación con los web services de AFIP utilizando nodejs.",
   "author": "Emilio Astarita",
   "licence": "MIT",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "packageManager": "pnpm@10.7.0",
   "engines": {
     "node": ">=6.0.0"
