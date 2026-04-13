@@ -20,6 +20,35 @@ export interface IResponseFECompUltimoAutorizado {
     [key: string]: unknown;
 }
 
+export interface IResponseFECAESolicitar {
+    FeCabResp: {
+        Cuit: string;
+        PtoVta: number;
+        CbteTipo: number;
+        FchProceso: string;
+        CantReg: number;
+        Resultado: string;
+        Reproceso: string;
+        [key: string]: unknown;
+    };
+    FeDetResp: {
+        FECAEDetResponse: Array<{
+            Concepto: number;
+            DocTipo: number;
+            DocNro: string;
+            CbteDesde: string;
+            CbteHasta: string;
+            CbteFch: string;
+            Resultado: string;
+            CAE?: string;
+            CAEFchVto?: string;
+            [key: string]: unknown;
+        }>;
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
+}
+
 export interface IParamsFEParamGetCondicionIvaReceptor extends IParamsAuth {
     params?: {
         ClaseCmp?: 'A' | 'B' | 'C' | 'M';

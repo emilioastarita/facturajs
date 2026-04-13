@@ -3,6 +3,7 @@ import {
     IParamsFECAESolicitar,
     IParamsFECompUltimoAutorizado,
     IParamsFEParamGetCondicionIvaReceptor,
+    IResponseFECAESolicitar,
     IResponseFECompUltimoAutorizado,
     WsServicesNames,
 } from './SoapMethods';
@@ -15,10 +16,16 @@ export class AfipServices {
         this.afipSoap = new AfipSoap(config);
     }
 
-    public createBill(params: IParamsFECAESolicitar) {
+    public createBill(
+        params: IParamsFECAESolicitar
+    ): Promise<IResponseFECAESolicitar> {
         const service = `wsfev1`;
         const method = `FECAESolicitar`;
-        return this.afipSoap.execMethod(service, method, params);
+        return this.afipSoap.execMethod(
+            service,
+            method,
+            params
+        ) as Promise<IResponseFECAESolicitar>;
     }
 
     public getLastBillNumber(
