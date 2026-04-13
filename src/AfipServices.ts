@@ -2,6 +2,7 @@ import { IConfigService } from './IConfigService';
 import {
     IParamsFECAESolicitar,
     IParamsFECompUltimoAutorizado,
+    IParamsFEParamGetCondicionIvaReceptor,
     WsServicesNames,
 } from './SoapMethods';
 import { AfipSoap } from './lib/AfipSoap';
@@ -22,6 +23,14 @@ export class AfipServices {
     public getLastBillNumber(params: IParamsFECompUltimoAutorizado) {
         const service = `wsfev1`;
         const method = `FECompUltimoAutorizado`;
+        return this.afipSoap.execMethod(service, method, params);
+    }
+
+    public getVatReceiverConditions(
+        params: IParamsFEParamGetCondicionIvaReceptor = {}
+    ) {
+        const service = `wsfev1`;
+        const method = `FEParamGetCondicionIvaReceptor`;
         return this.afipSoap.execMethod(service, method, params);
     }
 

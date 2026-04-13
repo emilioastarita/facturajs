@@ -1,4 +1,3 @@
-import 'source-map-support/register';
 import { AfipServices } from '../AfipServices';
 import { IConfigService } from '../IConfigService';
 import moment from 'moment';
@@ -44,6 +43,9 @@ async function monotributoExample() {
                         DocTipo: 99,
                         DocNro: 0,
                         Concepto: 1,
+                        // Consumidor final. Consultar AFIP con
+                        // FEParamGetCondicionIvaReceptor para otros casos.
+                        CondicionIVAReceptorId: 5,
                         CbteDesde: next,
                         CbteHasta: next,
                         CbteFch: moment().format('YYYYMMDD'),

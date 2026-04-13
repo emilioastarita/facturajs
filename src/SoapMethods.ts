@@ -15,6 +15,12 @@ export interface IParamsFECompUltimoAutorizado extends IParamsAuth {
     };
 }
 
+export interface IParamsFEParamGetCondicionIvaReceptor extends IParamsAuth {
+    params?: {
+        ClaseCmp?: 'A' | 'B' | 'C' | 'M';
+    };
+}
+
 export interface IParamsFECAESolicitar extends IParamsAuth {
     params: {
         FeCAEReq: {
@@ -39,6 +45,7 @@ export interface IParamsFECAESolicitar extends IParamsAuth {
                     ImpTrib: number;
                     MonId: 'PES';
                     MonCotiz: number;
+                    CondicionIVAReceptorId?: number;
                     Iva?: {
                         AlicIva: {
                             Id: number;

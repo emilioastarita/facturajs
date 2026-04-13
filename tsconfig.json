@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "lib": ["es2022"],
-    "module": "commonjs",
+    "module": "Node16",
     "target": "es2022",
-    "moduleResolution": "node",
+    "moduleResolution": "Node16",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
@@ -26,4 +26,3 @@
     "**/*.spec.ts"
   ]
 }
-

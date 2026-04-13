@@ -46,17 +46,10 @@ class ConfiguredHttpClient extends soap.HttpClient {
         exoptions?: any,
         caller?: any
     ) {
-        return super.request(
-            rurl,
-            data,
-            callback,
-            exheaders,
-            {
-                ...this.defaultRequestOptions,
-                ...exoptions,
-            },
-            caller
-        );
+        return super.request(rurl, data, callback, exheaders, {
+            ...this.defaultRequestOptions,
+            ...exoptions,
+        });
     }
 
     requestStream(
@@ -66,16 +59,10 @@ class ConfiguredHttpClient extends soap.HttpClient {
         exoptions?: any,
         caller?: any
     ) {
-        return super.requestStream(
-            rurl,
-            data,
-            exheaders,
-            {
-                ...this.defaultRequestOptions,
-                ...exoptions,
-            },
-            caller
-        );
+        return super.requestStream(rurl, data, exheaders, {
+            ...this.defaultRequestOptions,
+            ...exoptions,
+        });
     }
 }
 

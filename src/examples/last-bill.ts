@@ -1,7 +1,6 @@
 import { IConfigService } from '../IConfigService';
 
 import * as fs from 'fs';
-import 'source-map-support/register';
 import { AfipServices } from '../AfipServices';
 
 const config: IConfigService = {

@@ -5,7 +5,7 @@
 Afip Web Services desde nodejs.
 
 ````bash
-~$ yarn add facturajs
+~$ pnpm add facturajs
 # OR
 ~$ npm i facturajs
 ````
@@ -44,7 +44,7 @@ En este [pdf (WSASS como adherirse)](https://www.afip.gob.ar/ws/WSASS/WSASS_como
 
 #### Crear una factura electrónica
 
-En este ejemplo pueden [ver como crear una factura electrónica con el último número de comprobante válido](src/examples/create-bill.ts).
+En este ejemplo pueden [ver como crear una factura electrónica con el último número de comprobante válido](./src/examples/create-bill-facturaB.ts).
 
 Para poder ver más en detalle que está sucediendo se puede configurar el `LOG_LEVEL` y namespace de `DEBUG`:
 

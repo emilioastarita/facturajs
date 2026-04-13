@@ -1,4 +1,3 @@
-import 'source-map-support/register';
 import { AfipServices } from '../AfipServices';
 import { IConfigService } from '../IConfigService';
 
