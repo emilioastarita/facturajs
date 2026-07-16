@@ -23,8 +23,11 @@ interface ICredential {
         sign: string;
     };
     created: string;
+    expires?: string;
     service: WsServicesNames;
 }
+
+const DEFAULT_TOKENS_EXPIRE_MARGIN_SECONDS = 600;
 
 type ICredentialsCache = {
     [K in WsServicesNames]?: ICredential;
@@ -286,6 +289,10 @@ export class AfipSoap {
         const loginCmsReturn = result.loginCmsReturn;
         const res = await parseXml<{
             loginTicketResponse: {
+                header?: {
+                    generationTime?: string;
+                    expirationTime?: string;
+                };
                 credentials: {
                     token: string;
                     sign: string;
@@ -294,16 +301,33 @@ export class AfipSoap {
         }>(loginCmsReturn);
         return {
             created: moment().format(),
+            expires: res.loginTicketResponse.header?.expirationTime,
             service,
             tokens: res.loginTicketResponse.credentials,
         };
     }
 
-    private isExpired(expireStr: string) {
-        const now = moment(new Date());
-        const expire = moment(expireStr);
-        const duration = moment.duration(now.diff(expire));
-        return duration.asHours() > this.config.tokensExpireInHours;
+    private isExpired(credential: ICredential): boolean {
+        const marginSeconds =
+            this.config.tokensExpireMarginSeconds ??
+            DEFAULT_TOKENS_EXPIRE_MARGIN_SECONDS;
+        // Prefer the real expiration granted by WSAA. Credentials cached by
+        // older versions only have `created`, so fall back to estimating from
+        // the configured lifetime.
+        const expire = credential.expires
+            ? moment(credential.expires)
+            : moment(credential.created).add(
+                  this.config.tokensExpireInHours,
+                  'hours'
+              );
+        if (!expire.isValid()) {
+            return true;
+        }
+        // Refresh ahead of the actual expiration: the token must survive
+        // request latency and any clock drift against AFIP servers.
+        return moment().isSameOrAfter(
+            expire.subtract(marginSeconds, 'seconds')
+        );
     }
 
     private async getTokensFromCache(
@@ -315,7 +339,7 @@ export class AfipSoap {
         const cacheService =
             typeof cache[service] === 'undefined' ? null : cache[service];
 
-        if (cacheService && !this.isExpired(cacheService.created)) {
+        if (cacheService && !this.isExpired(cacheService)) {
             return cacheService;
         }
         return null;

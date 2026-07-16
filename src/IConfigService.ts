@@ -4,6 +4,7 @@ export interface IConfigServiceBasics {
     homo: boolean;
     cacheTokensPath: string;
     tokensExpireInHours: number;
+    tokensExpireMarginSeconds?: number;
     privateKeyContents?: string;
     privateKeyPath?: string;
     certPath?: string;
