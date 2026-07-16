@@ -95,9 +95,59 @@ afip.execRemote('wsfev1', 'FECAESolicitar', {
     }    
 }).then(res => console.log(res))
 ````
- 
- 
- 
+
+#### Interfaces TypeScript del WebService (generadas desde el WSDL)
+
+La librería incluye en `src/generated/wsfev1` interfaces TypeScript para todas las operaciones
+de `wsfev1`, generadas automáticamente a partir del WSDL oficial de AFIP con
+[wsdl-tsclient](https://github.com/dderevjanik/wsdl-tsclient). Se exportan bajo el namespace `Wsfev1`
+y son útiles para tipar llamadas hechas con `execRemote`:
+
+````typescript
+import { AfipServices, Wsfev1 } from 'facturajs';
+
+const afip = new AfipServices(config);
+const res = await afip.execRemote<Wsfev1.FeCompConsultarResult>(
+    'wsfev1',
+    'FECompConsultar',
+    {
+        Auth: { Cuit: 27000000000 },
+        params: { FeCompConsReq: { CbteTipo: 11, CbteNro: 44, PtoVta: 2 } },
+    }
+);
+console.log(res.ResultGet?.CodAutorizacion);
+````
+
+Notas sobre las interfaces generadas:
+
+* El nombre de cada interfaz sale del WSDL pero normalizado a PascalCase (por ejemplo
+  `FECAEDetRequest` se genera como `FecaeDetRequest`).
+* `execRemote` resuelve con el objeto `<Método>Result` de la respuesta SOAP, por lo que el tipo
+  que corresponde usar es el que termina en `...Result` (ej: `Wsfev1.FeCompConsultarResult`).
+* Todas las propiedades se generan como opcionales: el WSDL no distingue campos obligatorios
+  de manera confiable. Para los métodos de alto nivel (`createBill`, `getLastBillNumber`) se
+  mantienen los tipos curados a mano de `src/SoapMethods.ts`, que sí marcan los campos requeridos.
+
+##### Cómo regenerar las interfaces
+
+Si AFIP actualiza el WebService (nuevos métodos o campos), las interfaces se regeneran con:
+
+````bash
+# wsfev1 desde homologación (default)
+~$ pnpm generate:types
+
+# o indicando servicio y entorno
+~$ ./scripts/generate-wsdl-types.sh wsfev1 prod
+````
+
+El script descarga el WSDL (`https://wswhomo.afip.gov.ar/wsfev1/service.asmx?wsdl` en homologación),
+ejecuta `wsdl-tsclient` en modo `--emitDefinitionsOnly` (solo interfaces, sin código de cliente) y
+formatea el resultado con prettier. La descarga usa `--ciphers 'DEFAULT@SECLEVEL=1'` porque los
+servidores de AFIP requieren cifrados TLS legacy (ver la nota sobre openssl más abajo).
+
+El código generado se versiona en el repo: después de regenerar, revisar el diff y correr
+`pnpm build` para verificar que compile.
+
 #### Config
 
 El constructor `AfipServices` acepta un objeto que cumpla con la interfaz de `IConfigService`. La descripción de sus propiedades:

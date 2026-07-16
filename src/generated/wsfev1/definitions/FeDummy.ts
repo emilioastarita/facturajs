@@ -1,0 +1,2 @@
+/** FEDummy */
+export interface FeDummy {}
