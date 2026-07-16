@@ -8,6 +8,7 @@ import {
     WsServicesNames,
 } from './SoapMethods';
 import { AfipSoap } from './lib/AfipSoap';
+import { FeParamGetCondicionIvaReceptorResult } from './generated/wsfev1';
 
 export class AfipServices {
     private afipSoap: AfipSoap;
@@ -42,10 +43,14 @@ export class AfipServices {
 
     public getVatReceiverConditions(
         params: IParamsFEParamGetCondicionIvaReceptor = {}
-    ) {
+    ): Promise<FeParamGetCondicionIvaReceptorResult> {
         const service = `wsfev1`;
         const method = `FEParamGetCondicionIvaReceptor`;
-        return this.afipSoap.execMethod(service, method, params);
+        return this.afipSoap.execMethod(
+            service,
+            method,
+            params
+        ) as Promise<FeParamGetCondicionIvaReceptorResult>;
     }
 
     public execRemote<TResponse = unknown>(
