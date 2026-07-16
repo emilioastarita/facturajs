@@ -104,7 +104,8 @@ El constructor `AfipServices` acepta un objeto que cumpla con la interfaz de `IC
 
 * `homo` Un booleano que determina el uso del entorno de homologación.
 * `cacheTokensPath` Path a un file dónde se cachearan los tokens obtenidos para no solicitarlos cada vez.
-* `tokensExpireInHours` La cantidad de horas en la que expirará el archivo de tokens cacheados.
+* `tokensExpireInHours` La cantidad de horas en la que expirará el archivo de tokens cacheados. Se usa como fallback: si la respuesta del WSAA incluye `expirationTime` (el caso normal), se respeta esa fecha real de expiración.
+* `tokensExpireMarginSeconds` Margen de seguridad en segundos para renovar el token *antes* de su expiración real y tolerar latencia y desfasajes de reloj contra los servidores de AFIP. Por defecto `600` (10 minutos).
 * `privateKeyContents` El contenido de la private key (no hace falta path en este caso)
 * `privateKeyPath` Path a la private key (al igual que antes podemos omitir el contenido)
 * `certContents` El contenido del certificado (no hace falta path en este caso)
