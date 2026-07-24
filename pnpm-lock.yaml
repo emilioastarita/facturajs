@@ -21,7 +21,7 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       soap:
-        specifier: ^1.1.11
+        specifier: ^1.4.2
         version: 1.8.0(supports-color@8.1.1)
       xml2js:
         specifier: ^0.6.2
@@ -92,6 +92,7 @@ packages:
   '@xmldom/xmldom@0.8.12':
     resolution: {integrity: sha512-9k/gHF6n/pAi/9tqr3m3aqkuiNosYTurLLUtc7xQ9sxB/wm7WPygCv8GYa6mS0fLJEHhqMC1ATYhz++U/lRHqg==}
     engines: {node: '>=10.0.0'}
+    deprecated: this version has critical issues, please update to the latest version
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
