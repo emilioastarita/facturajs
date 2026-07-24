@@ -19,9 +19,12 @@ concurrency:
 # class of attack the pnpm settings guard against. Dependabot keeps these
 # current (see .github/dependabot.yml).
 #
-# `--ignore-scripts` on install is deliberate. This package's `prepare` script
-# runs `prettier --write`, so letting it run would silently reformat the tree
-# and make the format check pass no matter what was committed.
+# `--ignore-scripts` on install is deliberate. Nothing here needs a lifecycle
+# script to install — the build lives in `prepack`, and every job that needs
+# dist/ builds it explicitly. Keeping the flag means a script added to the
+# install path later cannot quietly do work that CI is supposed to verify (an
+# earlier `prepare` ran `prettier --write`, which would have made the format
+# check pass no matter what was committed).
 
 jobs:
     format:

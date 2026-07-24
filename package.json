@@ -13,7 +13,7 @@
   "scripts": {
     "prettier": "prettier --write \"{src,test}/**/*.{md,json,ts}\"",
     "clean": "rm -rf dist/*",
-    "prepare": "pnpm prettier && pnpm clean && pnpm build",
+    "prepack": "pnpm clean && pnpm build",
     "build": "pnpm exec tsc",
     "type:test": "pnpm exec tsc --project tsconfig.test.json",
     "format:check": "prettier --check \"{src,test}/**/*.{md,json,ts}\"",

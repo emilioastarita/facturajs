@@ -12,6 +12,12 @@ Repository tooling only — no change to the published package.
   allowlist, store integrity verification and a pinned package manager. CI
   enforces the policy against the committed lockfile, so a pull request that
   bumps a dependency to a freshly published version fails before it merges.
+- Moved the build from `prepare` to `prepack`. It used to run on every
+  `pnpm install`, which rebuilt `dist/` and — because `prepare` also ran
+  `prettier --write` — reformatted the working tree as a side effect of
+  installing. The build now runs only when a tarball is produced: `pnpm pack`,
+  `pnpm publish`, and installs straight from git (verified all three). Formatting
+  is checked in CI instead of being silently applied.
 - Refreshed transitive dependencies within their existing ranges, clearing all
   33 known advisories (`axios` 1.15.0 → 1.18.1, `@xmldom/xmldom` 0.8.12 →
   0.8.13, `form-data` 4.0.5 → 4.0.6). Only the lockfile moved; no declared range
