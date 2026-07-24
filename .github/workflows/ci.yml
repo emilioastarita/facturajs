@@ -1,0 +1,92 @@
+name: CI
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+    workflow_dispatch:
+
+# Least privilege: nothing here needs to write to the repo.
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+# Third-party actions are pinned to commit SHAs rather than tags: a tag can be
+# repointed at new code by whoever controls the action's repo, which is the same
+# class of attack the pnpm settings guard against. Dependabot keeps these
+# current (see .github/dependabot.yml).
+#
+# `--ignore-scripts` on install is deliberate. This package's `prepare` script
+# runs `prettier --write`, so letting it run would silently reformat the tree
+# and make the format check pass no matter what was committed.
+
+jobs:
+    format:
+        name: Format
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+            - run: pnpm format:check
+
+    test:
+        name: Test (node ${{ matrix.node }})
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                # The test runner needs directory globs and native TypeScript
+                # type stripping, both of which land in node 22. See build-floor
+                # for coverage of the oldest version the package itself supports.
+                node: ['22', '24']
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+            # Builds, type-checks the test sources under `strict`, then runs the
+            # suite against dist/.
+            - run: pnpm test
+
+    build-floor:
+        name: Build on engines floor
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  # Must track engines.node in package.json.
+                  node-version: '20.19'
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+            - run: pnpm build
+            - run: pnpm type:test
+
+    audit:
+        name: Audit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+                  cache: pnpm
+            # This install is the supply-chain gate as much as the audit is:
+            # pnpm validates the committed lockfile against the policies in
+            # pnpm-workspace.yaml and exits non-zero if an entry is, for
+            # instance, younger than minimumReleaseAge.
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+            - run: pnpm audit --audit-level high
