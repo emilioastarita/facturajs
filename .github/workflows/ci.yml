@@ -65,14 +65,47 @@ jobs:
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+            # pnpm 11 itself requires node >= 22.13 (it loads node:sqlite), so
+            # dependencies are installed on 22 and only the compile and the
+            # smoke test are run on the floor version. Consumers are unaffected
+            # by this — they install facturajs with their own package manager.
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+
             - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   # Must track engines.node in package.json.
                   node-version: '20.19'
-                  cache: pnpm
-            - run: pnpm install --frozen-lockfile --ignore-scripts
-            - run: pnpm build
-            - run: pnpm type:test
+            # Invoked directly rather than through `pnpm run`, which would pull
+            # in the pnpm binary again.
+            - run: node ./node_modules/typescript/bin/tsc
+            - run: node ./node_modules/typescript/bin/tsc --project tsconfig.test.json
+
+            # Compiling is not the same as loading: this is what catches a
+            # dependency that stops working on the declared floor.
+            - name: Smoke test the built package
+              run: |
+                  node -e "
+                  const { AfipServices, AfipSoap, Wsfev1 } = require('./dist/index.js');
+                  const svc = new AfipServices({
+                      homo: true,
+                      cacheTokensPath: '/tmp/floor-smoke.json',
+                      tokensExpireInHours: 12,
+                      certContents: 'unused',
+                      privateKeyContents: 'unused',
+                  });
+                  for (const m of ['createBill', 'getLastBillNumber', 'getVatReceiverConditions', 'execRemote']) {
+                      if (typeof svc[m] !== 'function') throw new Error('missing export: ' + m);
+                  }
+                  if (typeof AfipSoap !== 'function' || typeof Wsfev1 !== 'object') {
+                      throw new Error('unexpected index exports');
+                  }
+                  console.log('smoke ok on ' + process.version);
+                  "
 
     audit:
         name: Audit
