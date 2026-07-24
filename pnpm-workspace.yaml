@@ -1,0 +1,39 @@
+# pnpm settings. Since pnpm 10.16 this file — not .npmrc — is where pnpm's own
+# configuration lives.
+#
+# The threat model here is the npm-ecosystem supply-chain attack: a maintainer
+# account is compromised, a malicious patch version is published, and it is
+# pulled into thousands of builds within hours by lockfile refreshes and
+# `^`-ranged installs, usually executing its payload from a lifecycle script.
+
+# 1. Cooldown. Never resolve a version that was published less than 24h ago.
+#    Compromised releases are typically yanked within hours, so simply waiting
+#    is the single most effective mitigation available. Only affects resolution,
+#    so CI installs (--frozen-lockfile) are unaffected; it slows down `pnpm
+#    update`, which is the point.
+minimumReleaseAge: 1440
+
+# 2. No dependency lifecycle scripts. pnpm 10+ blocks them by default, but the
+#    allowlist is kept here explicitly and empty so that adding a dependency
+#    that wants to run code at install time is a visible, reviewable diff rather
+#    than a silent `pnpm approve-builds` on someone's laptop.
+onlyBuiltDependencies: []
+dangerouslyAllowAllBuilds: false
+
+# 3. Re-check tarball checksums against the lockfile even when serving from the
+#    local store, so a poisoned store cannot quietly feed a bad package.
+verifyStoreIntegrity: true
+
+# 4. Refuse to run scripts against a node_modules that has drifted from the
+#    lockfile — that drift is how a locally installed package survives a
+#    lockfile revert.
+verifyDepsBeforeRun: warn
+
+# 5. Pin pnpm itself. `packageManager` in package.json is only advisory unless
+#    these are on; a mismatched pnpm is just as capable of rewriting the
+#    lockfile as a bad dependency is.
+packageManagerStrict: true
+packageManagerStrictVersion: true
+
+# 6. Peer ranges must be satisfiable rather than quietly patched over.
+strictPeerDependencies: true

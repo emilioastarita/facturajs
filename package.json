@@ -4,7 +4,7 @@
   "author": "Emilio Astarita",
   "licence": "MIT",
   "version": "0.4.3",
-  "packageManager": "pnpm@10.7.0",
+  "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=20.19.0"
   },
@@ -13,9 +13,11 @@
   "scripts": {
     "prettier": "prettier --write \"{src,test}/**/*.{md,json,ts}\"",
     "clean": "rm -rf dist/*",
-    "prepare": "pnpm prettier && pnpm clean && pnpm build",
+    "prepack": "pnpm clean && pnpm build",
     "build": "pnpm exec tsc",
     "type:test": "pnpm exec tsc --project tsconfig.test.json",
+    "format:check": "prettier --check \"{src,test}/**/*.{md,json,ts}\"",
+    "audit": "pnpm audit --audit-level high",
     "test": "pnpm build && pnpm type:test && node --test \"test/**/*.test.ts\"",
     "generate:types": "./scripts/generate-wsdl-types.sh",
     "type:dts": "tsc --emitDeclarationOnly --project tsconfig.build.json"

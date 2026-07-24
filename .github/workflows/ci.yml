@@ -1,0 +1,128 @@
+name: CI
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+    workflow_dispatch:
+
+# Least privilege: nothing here needs to write to the repo.
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+# Third-party actions are pinned to commit SHAs rather than tags: a tag can be
+# repointed at new code by whoever controls the action's repo, which is the same
+# class of attack the pnpm settings guard against. Dependabot keeps these
+# current (see .github/dependabot.yml).
+#
+# `--ignore-scripts` on install is deliberate. Nothing here needs a lifecycle
+# script to install — the build lives in `prepack`, and every job that needs
+# dist/ builds it explicitly. Keeping the flag means a script added to the
+# install path later cannot quietly do work that CI is supposed to verify (an
+# earlier `prepare` ran `prettier --write`, which would have made the format
+# check pass no matter what was committed).
+
+jobs:
+    format:
+        name: Format
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+            - run: pnpm format:check
+
+    test:
+        name: Test (node ${{ matrix.node }})
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                # The test runner needs directory globs and native TypeScript
+                # type stripping, both of which land in node 22. See build-floor
+                # for coverage of the oldest version the package itself supports.
+                node: ['22', '24']
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+            # Builds, type-checks the test sources under `strict`, then runs the
+            # suite against dist/.
+            - run: pnpm test
+
+    build-floor:
+        name: Build on engines floor
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+            # pnpm 11 itself requires node >= 22.13 (it loads node:sqlite), so
+            # dependencies are installed on 22 and only the compile and the
+            # smoke test are run on the floor version. Consumers are unaffected
+            # by this — they install facturajs with their own package manager.
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  # Must track engines.node in package.json.
+                  node-version: '20.19'
+            # Invoked directly rather than through `pnpm run`, which would pull
+            # in the pnpm binary again.
+            - run: node ./node_modules/typescript/bin/tsc
+            - run: node ./node_modules/typescript/bin/tsc --project tsconfig.test.json
+
+            # Compiling is not the same as loading: this is what catches a
+            # dependency that stops working on the declared floor.
+            - name: Smoke test the built package
+              run: |
+                  node -e "
+                  const { AfipServices, AfipSoap, Wsfev1 } = require('./dist/index.js');
+                  const svc = new AfipServices({
+                      homo: true,
+                      cacheTokensPath: '/tmp/floor-smoke.json',
+                      tokensExpireInHours: 12,
+                      certContents: 'unused',
+                      privateKeyContents: 'unused',
+                  });
+                  for (const m of ['createBill', 'getLastBillNumber', 'getVatReceiverConditions', 'execRemote']) {
+                      if (typeof svc[m] !== 'function') throw new Error('missing export: ' + m);
+                  }
+                  if (typeof AfipSoap !== 'function' || typeof Wsfev1 !== 'object') {
+                      throw new Error('unexpected index exports');
+                  }
+                  console.log('smoke ok on ' + process.version);
+                  "
+
+    audit:
+        name: Audit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: '22'
+                  cache: pnpm
+            # This install is the supply-chain gate as much as the audit is:
+            # pnpm validates the committed lockfile against the policies in
+            # pnpm-workspace.yaml and exits non-zero if an entry is, for
+            # instance, younger than minimumReleaseAge.
+            - run: pnpm install --frozen-lockfile --ignore-scripts
+            - run: pnpm audit --audit-level high

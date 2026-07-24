@@ -1,0 +1,26 @@
+version: 2
+updates:
+    # Keeps the SHA pins in .github/workflows/ci.yml current. Without this,
+    # pinning actions by SHA means silently running stale action code forever.
+    - package-ecosystem: github-actions
+      directory: /
+      schedule:
+          interval: weekly
+      commit-message:
+          prefix: 'ci'
+
+    - package-ecosystem: npm
+      directory: /
+      schedule:
+          interval: weekly
+      open-pull-requests-limit: 5
+      commit-message:
+          prefix: 'deps'
+          prefix-development: 'deps-dev'
+      groups:
+          # One PR for routine bumps instead of one per package, so review
+          # attention goes to the diffs that actually matter.
+          minor-and-patch:
+              update-types:
+                  - minor
+                  - patch
