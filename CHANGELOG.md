@@ -33,7 +33,17 @@
     the returned promise is `soap`'s only error channel, and it does attach a
     rejection handler to it.
 
+### Changed
+
+- Raised the `soap` floor from `^1.1.11` to `^1.4.2`. Upstream dropped the
+  `async` from `Client._invoke` in 1.4.2, which removes the leak at the source;
+  the range previously allowed 1.4.1 and earlier, so consumers with an old
+  lockfile could still resolve an affected release. The resolved version is
+  unchanged (1.8.0) — only the floor moved.
+
 ### Added
 
 - Regression test suite (`pnpm test`) covering socket-level failures of both the
-  WSDL fetch and the SOAP call, with and without `tlsRequestOptions`.
+  WSDL fetch and the SOAP call, with and without `tlsRequestOptions`. The tests
+  assert the invariant directly against facturajs' own HttpClient, so they hold
+  whichever `soap` release ends up installed.
