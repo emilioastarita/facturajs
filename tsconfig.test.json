@@ -1,0 +1,11 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "declaration": false,
+        "sourceMap": false,
+        "allowImportingTsExtensions": true,
+        "rootDir": "."
+    },
+    "include": ["test/**/*"]
+}

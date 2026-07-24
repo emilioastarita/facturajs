@@ -34,6 +34,7 @@ type ICredentialsCache = {
 };
 
 type SoapRequestArgs = Parameters<soap.HttpClient['request']>;
+type SoapRequestResult = ReturnType<soap.HttpClient['request']>;
 type SoapRequestStreamArgs = Parameters<
     NonNullable<soap.HttpClient['requestStream']>
 >;
@@ -62,6 +63,29 @@ interface IAfipResponseError extends Error {
     code: string | number;
 }
 
+/**
+ * `soap`'s HttpClient reports a transport failure twice: once through the
+ * `callback` it was handed, and once through the promise it returns. Its own
+ * callers only read the callback and discard the promise — but in soap <=1.4.x
+ * `Client._invoke` is an `async` method whose last statement is
+ * `return this.httpClient.request(...)`. The `async` wrapper makes a fresh
+ * promise adopt that rejection, and `Client._defineMethod` throws it away, so
+ * the already-handled error resurfaces as a process-level `unhandledRejection`.
+ * AFIP resets connections often enough for this to be a daily occurrence in
+ * production.
+ *
+ * The callback is the channel soap actually reads, so the returned promise can
+ * safely be neutralised: keep the fulfilled response, drop the rejection.
+ */
+function withoutFloatingRejection(
+    pending: SoapRequestResult
+): SoapRequestResult {
+    return pending.then(
+        (response) => response,
+        () => undefined
+    ) as SoapRequestResult;
+}
+
 class ConfiguredHttpClient extends soap.HttpClient {
     constructor(
         private readonly defaultRequestOptions: Record<string, unknown>,
@@ -77,13 +101,18 @@ class ConfiguredHttpClient extends soap.HttpClient {
         exheaders?: SoapRequestArgs[3],
         exoptions?: SoapRequestArgs[4],
         _caller?: unknown
-    ) {
-        return super.request(rurl, data, callback, exheaders, {
-            ...this.defaultRequestOptions,
-            ...exoptions,
-        });
+    ): SoapRequestResult {
+        return withoutFloatingRejection(
+            super.request(rurl, data, callback, exheaders, {
+                ...this.defaultRequestOptions,
+                ...exoptions,
+            })
+        );
     }
 
+    // Not neutralised on purpose: in streaming mode the returned promise is the
+    // only channel soap has for reporting errors, and `Client._invoke` does
+    // attach a rejection handler to it.
     requestStream(
         rurl: SoapRequestStreamArgs[0],
         data: SoapRequestStreamArgs[1],
@@ -262,11 +291,14 @@ export class AfipSoap {
 
         if (Object.keys(tlsRequestOptions).length > 0) {
             options.wsdl_options = tlsRequestOptions;
-            options.httpClient = new ConfiguredHttpClient(
-                tlsRequestOptions,
-                options
-            );
         }
+
+        // Always installed, even without TLS overrides: this client is also what
+        // keeps soap from leaking unhandled rejections.
+        options.httpClient = new ConfiguredHttpClient(
+            tlsRequestOptions,
+            options
+        );
 
         return soap.createClientAsync(url, options);
     }
