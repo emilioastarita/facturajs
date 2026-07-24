@@ -35,6 +35,11 @@
 
 ### Changed
 
+- Corrected `engines.node` from `>=6.0.0` to `>=20.19.0`. The old value had been
+  stale for a long time and was never achievable: `soap` 1.8.0 requires Node
+  20.19+, `ntp-time-sync` requires 18+, and the published code targets ES2022.
+  This only makes the existing requirement visible — no runtime behaviour
+  changes, and nothing that worked before stops working.
 - Raised the `soap` floor from `^1.1.11` to `^1.4.2`. Upstream dropped the
   `async` from `Client._invoke` in 1.4.2, which removes the leak at the source;
   the range previously allowed 1.4.1 and earlier, so consumers with an old
